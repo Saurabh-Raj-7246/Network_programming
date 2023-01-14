@@ -1,0 +1,64 @@
+PYTHON CODE
+
+>>>Server
+from socket import *
+HOST = ''
+PORT = 8007
+BUFSIZ = 1024
+ADDR = (HOST, PORT)
+tcpSerSock = socket(AF_INET, SOCK_STREAM) 
+tcpSerSock.bind(ADDR)
+tcpSerSock.listen(5)
+while True:
+tcpCliSock, addr = tcpSerSock.accept() 
+print("Connected to ", addr)
+while True:
+data = tcpCliSock.recv(BUFSIZ)
+if not data:
+break
+while data.decode().strip().lower() != 'continue': 
+print(data.decode().strip())
+data = tcpCliSock.recv(BUFSIZ)
+message = input(">")
+while message.lower() != 'go' and message != '':
+message += '\r\n' 
+tcpCliSock.send(message.encode()) 
+message = input(">")
+tcpCliSock.close()
+if message != '': 
+tcpCliSock.send('continue\r\n'.encode()) 
+break
+else:
+break
+
+
+>>>Client
+from socket import * 
+HOST = 'localhost' 
+PORT = 8007
+BUFSIZ = 1024
+ADDR = (HOST, PORT)
+tcpCliSock = socket(AF_INET, SOCK_STREAM) 
+tcpCliSock.connect(ADDR)
+while True:
+message = input(">")
+if message == '':
+break
+while message.lower() != 'go':
+message += '\r\n' 
+tcpCliSock.send(message.encode()) 
+message = input(">")
+if message == '':
+break
+else:
+message = 'continue\r\n'
+tcpCliSock.send(message.encode()) 
+data = tcpCliSock.recv(BUFSIZ)
+data = data.decode().strip()
+if not data:
+break
+while data.lower() != 'continue':
+print(data)
+data = tcpCliSock.recv(BUFSIZ) 
+data = data.decode().strip()
+tcpCliSock.close()
